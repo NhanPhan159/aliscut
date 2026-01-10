@@ -62,7 +62,7 @@ void setTable() {
       printByColor(col);
     }
     cout << "\n";
-    if (i < 9) {
+    if (i < table.size() - 1) {
       for (int rd = 0; rd < 17; rd++) {
         switch (rd) {
         case 0:
@@ -133,7 +133,6 @@ int main() {
       table.push_back(split(str, "="));
     }
   }
-  table.push_back({"123", "123"});
   printVector2D(table);
   setTable();
   return 0;
