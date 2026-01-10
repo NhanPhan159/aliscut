@@ -6,12 +6,12 @@
 #include <vector>
 using namespace std;
 
-const string COLOR_CODE = "\e[0;32m";
+const string COLOR_CODE_DEFAULT = "\e[0;37m";
 const string RESET_CODE = "\e[0m";
 vector<vector<string>> table = {{"ALIAS", "MEANING"}};
 
-void printByColor(string content = "", string color = COLOR_CODE) {
-  cout << COLOR_CODE << content << RESET_CODE;
+void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
+  cout << color << content << RESET_CODE;
 }
 void draw_rect(int width, int height) {
   printByColor("+");
@@ -60,9 +60,9 @@ void setTable(int width_col_1, int width_col_2) {
     printByColor(col);
     for (int j = 0; j < 2; j++) {
       if (i == 0) {
-        printByColor(table[i][j], "\e[1;94m");
+        printByColor(table[i][j], "\e[0;33m");
       } else
-        cout << table[i][j];
+        printByColor(table[i][j], "\e[1;34m");
       if (j == 0) {
         strLen = width_col_1 - table[i][j].size() - 1;
       }
