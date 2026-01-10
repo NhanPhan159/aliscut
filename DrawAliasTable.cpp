@@ -34,19 +34,19 @@ void draw_rect(int width, int height) {
   }
   cout << "\e[0;32m+\n";
 }
-void setTable() {
+void setTable(int width_col_1, int width_col_2) {
   string row = "─", col = "│", cornerL = "│", cornerR = "│", midd = "┼",
          middD = "┴", cornerLU = "└", middU = "┬";
   string cornerRU = "┘", cornerRR = "┐", cornerLL = "┌",
          middleSingle = "│"; // ascii codes
 
   /* draw the top bar*/
-  for (int f = 0; f < 17; f++) {
+  for (int f = 0; f < width_col_1 + width_col_2; f++) {
     if (f == 0) {
       printByColor(cornerLL);
-    } else if (f == 16) {
+    } else if (f == width_col_1 + width_col_2 - 1) {
       printByColor(cornerRR);
-    } else if (f == 8) {
+    } else if (f == width_col_1) {
       printByColor(middU);
     } else {
       printByColor(row);
@@ -54,45 +54,50 @@ void setTable() {
   }
 
   /* draw the middle content*/
+  int strLen = 0;
   for (int i = 0; i < table.size(); i++) {
     cout << "\n";
     printByColor(col);
     for (int j = 0; j < 2; j++) {
-      cout << table[i][j] << "\t";
+      if (i == 0) {
+        printByColor(table[i][j], "\e[1;94m");
+      } else
+        cout << table[i][j];
+      if (j == 0) {
+        strLen = width_col_1 - table[i][j].size() - 1;
+      }
+      if (j == 1) {
+        strLen = width_col_2 - table[i][j].size() - 2;
+      }
+      for (int x = 0; x < strLen; x++) {
+        cout << " ";
+      }
       printByColor(col);
     }
     cout << "\n";
     if (i < table.size() - 1) {
-      for (int rd = 0; rd < 17; rd++) {
-        switch (rd) {
-        case 0:
+      for (int rd = 0; rd < width_col_1 + width_col_2; rd++) {
+        if (rd == 0)
           printByColor(cornerL);
-          continue;
-        case 16:
+        else if (rd == width_col_2 + width_col_1 - 1) {
           printByColor(cornerR);
-          continue;
-        case 8:
+        } else if (rd == width_col_1)
           printByColor(midd);
-          continue;
-        default:
+        else {
           printByColor(row);
         }
       }
     }
   }
   /* draw the last bar*/
-  for (int rd = 0; rd < 17; rd++) {
-    switch (rd) {
-    case 0:
+  for (int rd = 0; rd < width_col_1 + width_col_2; rd++) {
+    if (rd == 0)
       printByColor(cornerLU);
-      continue;
-    case 16:
+    else if (rd == width_col_2 + width_col_1 - 1) {
       printByColor(cornerRU);
-      continue;
-    case 8:
+    } else if (rd == width_col_1)
       printByColor(middD);
-      continue;
-    default:
+    else {
       printByColor(row);
     }
   }
@@ -119,8 +124,8 @@ void printVector2D(vector<vector<string>> vec) {
   }
 }
 int main() {
-  int maxLenCol1 = 17;
-  int maxLenCol2 = 17;
+  int maxLenCol1 = 1;
+  int maxLenCol2 = 1;
   std::ifstream file("/Users/nhanphan159/.zshrc");
   std::string str;
   std::string file_content;
@@ -134,6 +139,6 @@ int main() {
     }
   }
   printVector2D(table);
-  setTable();
+  setTable(maxLenCol1 + 1, maxLenCol2 + 3);
   return 0;
 }
