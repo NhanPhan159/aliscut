@@ -14,6 +14,7 @@ using namespace std;
 const string COLOR_CODE_DEFAULT = "\e[0;37m";
 const string RESET_CODE = "\e[0m";
 vector<vector<string>> table = {{"ALIAS", "MEANING"}};
+const char *homedir;
 
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
@@ -108,18 +109,18 @@ void printVector2D(vector<vector<string>> vec) {
   }
 }
 
-const char *homedir;
 int main() {
   struct stat sb;
-  if ((homedir = getenv("HOME")) == NULL) {
-    homedir = getpwuid(getuid())->pw_dir;
-  }
   int maxLenCol1 = 1;
   int maxLenCol2 = 1;
   string support_shell[] = {"./bashrc", "/.zshrc"};
   string shell_config_path;
   char *shell_config_path_char;
 
+  // get shell config path
+  if ((homedir = getenv("HOME")) == NULL) {
+    homedir = getpwuid(getuid())->pw_dir;
+  }
   for (string shell : support_shell) {
     shell_config_path = (string)homedir + shell;
     shell_config_path_char = shell_config_path.data();
@@ -128,11 +129,13 @@ int main() {
     }
   }
   cout << "Shell path config: " << shell_config_path << endl;
-  std::ifstream file(shell_config_path);
-  std::string str;
-  std::string file_content;
-  while (std::getline(file, str)) {
-    if (str.find("alias") != std::string::npos) {
+
+  // get table alias
+  ifstream file(shell_config_path);
+  string str;
+  string file_content;
+  while (getline(file, str)) {
+    if (str.find("alias") != string::npos) {
       str = str.substr(5);
       vector<string> aliasItem = split(str, "=");
       maxLenCol1 = max<int>(aliasItem[0].length(), maxLenCol1);
