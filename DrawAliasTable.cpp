@@ -2,8 +2,13 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <pwd.h>
 #include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <vector>
+
 using namespace std;
 
 const string COLOR_CODE_DEFAULT = "\e[0;37m";
@@ -13,32 +18,11 @@ vector<vector<string>> table = {{"ALIAS", "MEANING"}};
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
 }
-void draw_rect(int width, int height) {
-  printByColor("+");
-  for (int i = 0; i < width - 2; i++) {
-    printByColor("-");
-  }
-  printByColor("+\n");
 
-  for (int i = 0; i < height - 2; i++) {
-    printByColor("|");
-    for (int j = 0; j < width - 2; j++) {
-      cout << " ";
-    }
-    printByColor("|\n");
-  }
-
-  cout << "\e[0;32m+";
-  for (int i = 0; i < width - 2; i++) {
-    cout << "\e[0;32m-";
-  }
-  cout << "\e[0;32m+\n";
-}
 void setTable(int width_col_1, int width_col_2) {
   string row = "─", col = "│", cornerL = "│", cornerR = "│", midd = "┼",
          middD = "┴", cornerLU = "└", middU = "┬";
-  string cornerRU = "┘", cornerRR = "┐", cornerLL = "┌",
-         middleSingle = "│"; // ascii codes
+  string cornerRU = "┘", cornerRR = "┐", cornerLL = "┌", middleSingle = "│";
 
   /* draw the top bar*/
   for (int f = 0; f < width_col_1 + width_col_2; f++) {
@@ -123,10 +107,28 @@ void printVector2D(vector<vector<string>> vec) {
     }
   }
 }
+
+const char *homedir;
 int main() {
+  struct stat sb;
+  if ((homedir = getenv("HOME")) == NULL) {
+    homedir = getpwuid(getuid())->pw_dir;
+  }
   int maxLenCol1 = 1;
   int maxLenCol2 = 1;
-  std::ifstream file("/Users/nhanphan159/.zshrc");
+  string support_shell[] = {"./bashrc", "/.zshrc"};
+  string shell_config_path;
+  char *shell_config_path_char;
+
+  for (string shell : support_shell) {
+    shell_config_path = (string)homedir + shell;
+    shell_config_path_char = shell_config_path.data();
+    if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
+      break;
+    }
+  }
+  cout << "Shell path config: " << shell_config_path << endl;
+  std::ifstream file(shell_config_path);
   std::string str;
   std::string file_content;
   while (std::getline(file, str)) {
@@ -138,7 +140,6 @@ int main() {
       table.push_back(split(str, "="));
     }
   }
-  printVector2D(table);
   setTable(maxLenCol1 + 1, maxLenCol2 + 3);
   return 0;
 }
