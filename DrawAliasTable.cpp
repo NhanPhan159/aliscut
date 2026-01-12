@@ -111,8 +111,8 @@ void printVector2D(vector<vector<string>> vec) {
 
 int main() {
   struct stat sb;
-  int maxLenCol1 = 1;
-  int maxLenCol2 = 1;
+  int maxLenAlias = 1;
+  int maxLenMeaning = 1;
   string support_shell[] = {"./bashrc", "/.zshrc"};
   string shell_config_path;
   char *shell_config_path_char;
@@ -128,7 +128,6 @@ int main() {
       break;
     }
   }
-  cout << "Shell path config: " << shell_config_path << endl;
 
   // get table alias
   ifstream file(shell_config_path);
@@ -138,13 +137,13 @@ int main() {
     if (str.find("alias") != string::npos) {
       str = str.substr(5);
       vector<string> aliasItem = split(str, "=");
-      maxLenCol1 = max<int>(aliasItem[0].length(), maxLenCol1);
-      maxLenCol2 = max<int>(aliasItem[1].length(), maxLenCol2);
+      maxLenAlias = max<int>(aliasItem[0].length(), maxLenAlias);
+      maxLenMeaning = max<int>(aliasItem[1].length(), maxLenMeaning);
       table.push_back(split(str, "="));
     }
   }
   if (table.size() > 1) {
-    setTable(maxLenCol1 + 1, maxLenCol2 + 3);
+    setTable(maxLenAlias + 1, maxLenMeaning + 3);
   } else {
     cout << R"(
 __  __                   __                     __     __                                                   ___           
