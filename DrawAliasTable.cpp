@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <pwd.h>
+#include <regex>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -108,6 +109,11 @@ void printVector2D(vector<vector<string>> vec) {
     }
   }
 }
+string preprocessString(string value) {
+  regex pattern(R"(['"])");
+  string result = regex_replace(value, pattern, "");
+  return result;
+}
 
 int main() {
   struct stat sb;
@@ -137,9 +143,12 @@ int main() {
     if (str.find("alias") != string::npos) {
       str = str.substr(5);
       vector<string> aliasItem = split(str, "=");
+      for (int i = 0; i < aliasItem.size(); i++) {
+        aliasItem[i] = preprocessString(aliasItem[i]);
+      }
       maxLenAlias = max<int>(aliasItem[0].length(), maxLenAlias);
       maxLenMeaning = max<int>(aliasItem[1].length(), maxLenMeaning);
-      table.push_back(split(str, "="));
+      table.push_back(aliasItem);
     }
   }
   if (table.size() > 1) {
