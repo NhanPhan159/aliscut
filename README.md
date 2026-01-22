@@ -45,4 +45,9 @@ aliscut
 
 ---
 
-MIT License
+## License
+
+MIT License © 2026 Nhan Phan  
+See [LICENSE](LICENSE) for more information.
+
+---
