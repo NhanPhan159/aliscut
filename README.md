@@ -27,8 +27,11 @@ I usually define many aliases to avoid repeating long command-line instructions 
 # clone the repo
 git clone git@github.com:NhanPhan159/aliscut.git
 
+# for MacOS install make
+brew install make
+
 # Build the application
-g++ DrawAliasTable.cpp -o aliscut
+make
 
 # Move to a directory in your PATH
 sudo mv aliscut /usr/local/bin/
