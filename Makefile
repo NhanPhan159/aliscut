@@ -1,3 +1,3 @@
 CXX = g++
 aliscut: DrawAliasTable.cpp
-	$(CXX) DrawAliasTable.cpp -o aliscut	
+	$(CXX) -std=c++17 DrawAliasTable.cpp -o aliscut	
