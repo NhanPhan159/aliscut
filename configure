@@ -1,0 +1,35 @@
+
+#!/bin/sh
+
+# default values
+prefix="/usr/local"
+cxx="g++"
+cxxflags="-O2"
+
+for arg in "$@"
+do
+  case $arg in
+    --prefix=*)
+      prefix="${arg#*=}"
+      ;;
+    CXX=*)
+      cxx="${arg#*=}"
+      ;;
+    CXXFLAGS=*)
+      cxxflags="${arg#*=}"
+      ;;
+  esac
+done
+
+echo "Generating config.mk..."
+
+cat > config.mk <<EOF
+PREFIX=${prefix}
+CXX=${cxx}
+CXXFLAGS=${cxxflags}
+EOF
+
+echo "Configuration complete"
+echo "  PREFIX=${prefix}"
+echo "  CXX=${cxx}"
+echo "  CXXFLAGS=${cxxflags}"
