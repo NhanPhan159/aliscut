@@ -1,3 +1,5 @@
-include config.mk
+CXX:=g++
+CXXSTD=c++17
+
 aliscut: DrawAliasTable.cpp
-	$(CXX) -std=c++17 DrawAliasTable.cpp -o aliscut	
+	$(CXX) -std=$(CXXSTD) DrawAliasTable.cpp -o aliscut	

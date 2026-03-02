@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <pwd.h>
 #include <regex>
 #include <string>
@@ -14,8 +15,14 @@ using namespace std;
 
 const string COLOR_CODE_DEFAULT = "\e[0;37m";
 const string RESET_CODE = "\e[0m";
+const string RED_COLOR = "\e[1;31m";
+const string WARNING_MESSAGE = "You don't have any aliases";
+const regex ALIAS_PATTERN(
+    "^alias\\s+[a-zA-Z_][a-zA-Z0-9_]+=\"[a-zA-Z_][a-zA-Z0-9_]+\"$");
 vector<vector<string>> table = {{"ALIAS", "MEANING"}};
 const char *homedir;
+const int MAX_ALIAS_COL = 8;
+const int MAX_MEANING_COL = 8;
 
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
@@ -140,28 +147,25 @@ int main() {
   string str;
   string file_content;
   while (getline(file, str)) {
-    if (str.find("alias") != string::npos) {
+    if (regex_match(str, ALIAS_PATTERN)) {
       str = str.substr(5);
       vector<string> aliasItem = split(str, "=");
       for (int i = 0; i < aliasItem.size(); i++) {
         aliasItem[i] = preprocessString(aliasItem[i]);
       }
-      maxLenAlias = max<int>(aliasItem[0].length(), maxLenAlias);
-      maxLenMeaning = max<int>(aliasItem[1].length(), maxLenMeaning);
+      maxLenAlias =
+          max<int>(max<int>(aliasItem[0].length(), maxLenAlias), MAX_ALIAS_COL);
+      maxLenMeaning = max<int>(max<int>(aliasItem[1].length(), maxLenMeaning),
+                               MAX_MEANING_COL);
       table.push_back(aliasItem);
     }
   }
   if (table.size() > 1) {
     setTable(maxLenAlias + 1, maxLenMeaning + 3);
   } else {
-    cout << R"(
-__  __                   __                     __     __                                                   ___           
-\ \/ /___  __  __   ____/ /___     ____  ____  / /_   / /_  ____ __   _____     ____ _____  __  __   ____ _/ (_)___ ______
- \  / __ \/ / / /  / __  / __ \   / __ \/ __ \/ __/  / __ \/ __ `/ | / / _ \   / __ `/ __ \/ / / /  / __ `/ / / __ `/ ___/
- / / /_/ / /_/ /  / /_/ / /_/ /  / / / / /_/ / /_   / / / / /_/ /| |/ /  __/  / /_/ / / / / /_/ /  / /_/ / / / /_/ (__  ) 
-/_/\____/\__,_/   \__,_/\____/  /_/ /_/\____/\__/  /_/ /_/\__,_/ |___/\___/   \__,_/_/ /_/\__, /   \__,_/_/_/\__,_/____/  
- )";
+    printByColor(WARNING_MESSAGE, RED_COLOR);
   }
+  cout << endl;
 
   return 0;
 }
