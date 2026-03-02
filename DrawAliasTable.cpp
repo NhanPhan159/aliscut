@@ -125,7 +125,7 @@ int main() {
   struct stat sb;
   int maxLenAlias = 1;
   int maxLenMeaning = 1;
-  string support_shell[] = {"./bashrc", "/.zshrc"};
+  string support_shell[] = {"/.bashrc", "/.zshrc"};
   string shell_config_path;
   char *shell_config_path_char;
 
