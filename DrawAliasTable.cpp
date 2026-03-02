@@ -17,8 +17,7 @@ const string COLOR_CODE_DEFAULT = "\e[0;37m";
 const string RESET_CODE = "\e[0m";
 const string RED_COLOR = "\e[1;31m";
 const string WARNING_MESSAGE = "You don't have any aliases";
-const regex ALIAS_PATTERN(
-    "^alias\\s+[a-zA-Z_][a-zA-Z0-9_]+=\"[a-zA-Z_][a-zA-Z0-9_]+\"$");
+const regex ALIAS_PATTERN("^alias\\s+[a-zA-Z0-9_\\-]+=\".+\"$");
 vector<vector<string>> table = {{"ALIAS", "MEANING"}};
 const char *homedir;
 const int MAX_ALIAS_COL = 8;
@@ -161,7 +160,7 @@ int main() {
     }
   }
   if (table.size() > 1) {
-    setTable(maxLenAlias + 1, maxLenMeaning + 3);
+    setTable(maxLenAlias + 2, maxLenMeaning + 4);
   } else {
     printByColor(WARNING_MESSAGE, RED_COLOR);
   }
