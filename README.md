@@ -26,14 +26,33 @@ I usually define many aliases to avoid repeating long command-line instructions 
 ```bash
 # clone the repo
 git clone git@github.com:NhanPhan159/aliscut.git
+```
 
-# for MacOS install make
+#### Install g++
+```bash
+# for Linux (ubuntu distro)
+sudo apt update (optional)
+sudo apt upgrade (optional)
+sudo apt install g++
+
+# for MacOS
+# If you have x-code just skip this step
+brew install gcc
+```
+
+#### Install make
+```bash
+# for macOS
 brew install make
+```
 
-# Build the application
+#### Build the application
+``` bash
 make
+```
 
-# Move to a directory in your PATH
+#### Move to a directory in your PATH
+``` bash
 sudo mv aliscut /usr/local/bin/
 ```
 
