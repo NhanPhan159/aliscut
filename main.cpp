@@ -1,36 +1,43 @@
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
+#include <ftxui/component/component_options.hpp>
+#include <ftxui/dom/deprecated.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/node.hpp>
 #include <ftxui/screen/screen.hpp>
-#include <iostream>
-
+using namespace std;
 using namespace ftxui;
 
-Component DummyWindowContent() {
-  class Impl : public ComponentBase {
-  private:
-    bool checked[3] = {false, false, false};
-    float slider = 50;
+Element render(const WindowRenderState &state) {
+  Element element = state.inner;
+  if (!state.active) {
+    element |= dim;
+  }
 
-  public:
-    Impl() {
-      Add(Container::Vertical({
-          Checkbox("Check me", &checked[0]),
-          Checkbox("Check me", &checked[1]),
-          Checkbox("Check me", &checked[2]),
-          Slider("Slider", &slider, 0.f, 100.f),
-      }));
-    }
-  };
-  return Make<Impl>();
+  int terminalWidth = Dimension::Full().dimx;
+  element = window(text("  " + state.title + "  ") | hcenter | bold |
+                       size(WIDTH, EQUAL, terminalWidth),
+                   element);
+  return element;
+}
+Component Text(const string t) {
+  return Renderer([t] { return text(t); });
 }
 int main() {
+  string value = "";
+  Component innerSearchWindow = Container::Horizontal(
+      {Text("🔎"), Input(value, {.transform = [](InputState state) {
+                           return state.element;
+                         }})});
   int terminalWidth = Dimension::Full().dimx;
-  auto window_1 = Window({.inner = DummyWindowContent(),
-                          .title = "First window",
-                          .width = terminalWidth});
+  Component searchWindow = Window({.inner = innerSearchWindow,
+                                   .title = "Search Keyword",
+                                   .left = 3,
+                                   .width = terminalWidth,
+                                   .height = 3,
+                                   .render = render});
 
-  auto layout = Container::Vertical({window_1});
+  Component layout = Container::Vertical({searchWindow});
 
   auto screen = App::Fullscreen();
   screen.Loop(layout);
