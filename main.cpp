@@ -20,16 +20,23 @@ Element render(const WindowRenderState &state) {
                    element);
   return element;
 }
-Component Text(const string t) {
+Component TextRef(string &t) {
+  return Renderer([&t] { return text(t); });
+}
+Component Text(string t) {
   return Renderer([t] { return text(t); });
 }
 int main() {
-  string value = "";
-  Component innerSearchWindow = Container::Horizontal(
-      {Text("🔎"), Input(value, {.transform = [](InputState state) {
-                           return state.element;
-                         }})});
   int terminalWidth = Dimension::Full().dimx;
+  int terminalHeight = Dimension::Full().dimy;
+  string searchStr = "";
+
+  Component innerSearchWindow = Container::Horizontal(
+      {Text("🔎"), Input(&searchStr, {.transform = [](InputState state) {
+         return state.element;
+       }})});
+  Component resultCompenent = Container::Vertical({TextRef(searchStr)});
+
   Component searchWindow = Window({.inner = innerSearchWindow,
                                    .title = "Search Keyword",
                                    .left = 3,
@@ -37,7 +44,15 @@ int main() {
                                    .height = 3,
                                    .render = render});
 
-  Component layout = Container::Vertical({searchWindow});
+  Component resultWindow = Window({.inner = resultCompenent,
+                                   .title = "Result",
+                                   .left = 3,
+                                   .width = terminalWidth,
+                                   .height = terminalHeight / 2,
+                                   .render = render});
+
+  Component layout = Container::Vertical(
+      {searchWindow, Renderer([] { return separatorEmpty(); }), resultWindow});
 
   auto screen = App::Fullscreen();
   screen.Loop(layout);
