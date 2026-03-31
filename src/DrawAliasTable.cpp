@@ -1,3 +1,4 @@
+#include "../include/static/drawTable.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -13,21 +14,11 @@
 
 using namespace std;
 
-const string COLOR_CODE_DEFAULT = "\e[0;37m";
-const string RESET_CODE = "\e[0m";
-const string RED_COLOR = "\e[1;31m";
-const string WARNING_MESSAGE = "You don't have any aliases";
-const regex ALIAS_PATTERN("^alias\\s+[a-zA-Z0-9_\\-]+=[\"'].+[\"']$");
-vector<vector<string>> table = {{"ALIAS", "MEANING"}};
-const char *homedir;
-const int MAX_ALIAS_COL = 8;
-const int MAX_MEANING_COL = 8;
-
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
 }
 
-void setTable(int width_col_1, int width_col_2) {
+void setTable(int width_col_1, int width_col_2, vector<vector<string>> table) {
   string row = "─", col = "│", cornerL = "│", cornerR = "│", midd = "┼",
          middD = "┴", cornerLU = "└", middU = "┬";
   string cornerRU = "┘", cornerRR = "┐", cornerLL = "┌", middleSingle = "│";
@@ -94,7 +85,7 @@ void setTable(int width_col_1, int width_col_2) {
     }
   }
 }
-std::vector<std::string> split(std::string s, std::string delimiter) {
+vector<string> split(string s, string delimiter) {
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   std::string token;
   std::vector<std::string> res;
@@ -121,7 +112,9 @@ string preprocessString(string value) {
   return result;
 }
 
-int main() {
+void drawTable() {
+  vector<vector<string>> table = {{"ALIAS", "MEANING"}};
+  const char *homedir;
   struct stat sb;
   int maxLenAlias = 1;
   int maxLenMeaning = 1;
@@ -160,11 +153,66 @@ int main() {
     }
   }
   if (table.size() > 1) {
-    setTable(maxLenAlias + 2, maxLenMeaning + 4);
+    setTable(maxLenAlias + 2, maxLenMeaning + 4, table);
   } else {
     printByColor(WARNING_MESSAGE, RED_COLOR);
   }
   cout << endl;
+}
+vector<vector<string>> getTableAlias() {
+  vector<vector<string>> table;
+  const char *homedir;
+  struct stat sb;
+  int maxLenAlias = 1;
+  int maxLenMeaning = 1;
+  string support_shell[] = {"/.bashrc", "/.zshrc"};
+  string shell_config_path;
+  char *shell_config_path_char;
 
-  return 0;
+  // get shell config path
+  if ((homedir = getenv("HOME")) == NULL) {
+    homedir = getpwuid(getuid())->pw_dir;
+  }
+  for (string shell : support_shell) {
+    shell_config_path = (string)homedir + shell;
+    shell_config_path_char = shell_config_path.data();
+    if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
+      break;
+    }
+  }
+
+  // get table alias
+  ifstream file(shell_config_path);
+  string str;
+  string file_content;
+  while (getline(file, str)) {
+    if (regex_match(str, ALIAS_PATTERN)) {
+      str = str.substr(5);
+      vector<string> aliasItem = split(str, "=");
+      for (int i = 0; i < aliasItem.size(); i++) {
+        aliasItem[i] = preprocessString(aliasItem[i]);
+      }
+      maxLenAlias =
+          max<int>(max<int>(aliasItem[0].length(), maxLenAlias), MAX_ALIAS_COL);
+      maxLenMeaning = max<int>(max<int>(aliasItem[1].length(), maxLenMeaning),
+                               MAX_MEANING_COL);
+      table.push_back(aliasItem);
+    }
+  }
+  return table;
+}
+
+vector<string> getAliases(vector<vector<string>> table) {
+  vector<string> aliases = {};
+  for (int idx = 0; idx < table.size(); idx++) {
+    aliases.push_back(table[idx][0]);
+  }
+  return aliases;
+}
+vector<string> getMeaning(vector<vector<string>> table) {
+  vector<string> meanings = {};
+  for (int idx = 0; idx < table.size(); idx++) {
+    meanings.push_back(table[idx][1]);
+  }
+  return meanings;
 }
