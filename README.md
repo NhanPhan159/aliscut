@@ -1,10 +1,14 @@
+<h1 align="center">Aliscut</h1>
+
+<p align="center">
+Minimal CLI show alias in system, written in C++
+</p>
+
 <div align="center">
-
-# ALISCUT
-
-Minimal CLI show alias in terminal
-
+  <img src="./assets/aliscut-general-rounded.png" alt="screenshot" width="70%">
 </div>
+
+<br>
 
 ---
 
@@ -16,33 +20,30 @@ I usually define many aliases to avoid repeating long command-line instructions 
 
 ## Features
 
-* Show the aliases with the one command line
-* Color support for terminals
-* Support TUI
-* Searching alias (in developing)
+- Show the aliases with the one command line
+- Color support for terminals
+- Support TUI
 
 ---
 
 ## Install
 
-```bash
-# clone the repo
-git clone git@github.com:NhanPhan159/aliscut.git
-```
+### Dependences
 
-#### Install dependencies for Linux (ubuntu distro)
+#### For Ubuntu
 ```bash
+
 sudo apt update (optional)
 sudo apt upgrade (optional)
 sudo apt install cmake g++ make libftxui-dev
-
-# for MacOS
-# If you have x-code just skip this step
-brew install gcc
 ```
 
-#### Install dependencies for MacOS
+#### For MacOS
 ```bash
+
+# If you have x-code just skip this step
+brew install gcc
+
 brew install make
 brew install cmake
 brew install --HEAD ftxui
@@ -50,6 +51,10 @@ brew install --HEAD ftxui
 
 #### Build the application
 ``` bash
+# clone the repo
+git clone git@github.com:NhanPhan159/aliscut.git
+
+# build app
 cd aliscut
 mkdir build
 cd build
@@ -66,10 +71,13 @@ sudo mv aliscut /usr/local/bin/
 
 ## Usage
 
-### Basic usage
-Just type : ```bash aliscut ``` <br/>
-For simple table you need add -s option : ```bash aliscut -s ```
+```bash
+# Basic usage, this show the TUI app
+aliscut
 
+# Show simple table aliases to quick look
+aliscut -s
+```
 ---
 
 ## License
