@@ -24,7 +24,7 @@ Element render(const WindowRenderState &state) {
   int terminalWidth = Dimension::Full().dimx;
   element = window(text("  " + state.title + "  ") | hcenter | bold |
                        size(WIDTH, EQUAL, terminalWidth),
-                   element);
+                   element | vscroll_indicator | frame);
   return element;
 }
 Element renderMeaningWindow(const WindowRenderState &state) {
