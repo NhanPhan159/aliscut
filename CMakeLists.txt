@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 4.2)
 project(aliscut)
 find_package(ftxui REQUIRED)
 add_executable(
-	main 
+	 aliscut
 )
 target_sources(
-	main
+	aliscut	
 	PRIVATE
 		main.cpp
 		src/DrawAliasTable.cpp
@@ -17,7 +17,7 @@ target_sources(
 		FILES
 			include/static/drawTable.hpp
 )
-target_link_libraries(main
+target_link_libraries(aliscut
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component
