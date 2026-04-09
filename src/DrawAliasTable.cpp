@@ -18,7 +18,7 @@ void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
 }
 
-void setTable(int width_col_1, int width_col_2, vector<vector<string>> table) {
+void setTable(int width_col_1, int width_col_2, vector<alias_struct> table) {
   string row = "─", col = "│", cornerL = "│", cornerR = "│", midd = "┼",
          middD = "┴", cornerLU = "└", middU = "┬";
   string cornerRU = "┘", cornerRR = "┐", cornerLL = "┌", middleSingle = "│";
@@ -43,14 +43,21 @@ void setTable(int width_col_1, int width_col_2, vector<vector<string>> table) {
     printByColor(col);
     for (int j = 0; j < 2; j++) {
       if (i == 0) {
-        printByColor(table[i][j], "\e[0;33m");
-      } else
-        printByColor(table[i][j], "\e[1;34m");
+        if (j == 0)
+          printByColor(table[i].name, "\e[0;33m");
+        else
+          printByColor(table[i].meaning, "\e[0;33m");
+      } else {
+        if (j == 0)
+          printByColor(table[i].name, "\e[1;34m");
+        else
+          printByColor(table[i].meaning, "\e[1;34m");
+      }
       if (j == 0) {
-        strLen = width_col_1 - table[i][j].size() - 1;
+        strLen = width_col_1 - table[i].name.size() - 1;
       }
       if (j == 1) {
-        strLen = width_col_2 - table[i][j].size() - 2;
+        strLen = width_col_2 - table[i].meaning.size() - 2;
       }
       for (int x = 0; x < strLen; x++) {
         cout << " ";
@@ -85,25 +92,30 @@ void setTable(int width_col_1, int width_col_2, vector<vector<string>> table) {
     }
   }
 }
-vector<string> split(string s, string delimiter) {
+alias_struct split(string s, string delimiter) {
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   std::string token;
-  std::vector<std::string> res;
+  std::vector<alias_struct> res;
+  vector<string> split_string;
+  alias_struct alias_item = {"", ""};
 
-  while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+  if ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
     token = s.substr(pos_start, pos_end - pos_start);
     pos_start = pos_end + delim_len;
-    res.push_back(token);
+    split_string.push_back(token);
   }
-
-  res.push_back(s.substr(pos_start));
-  return res;
+  split_string.push_back(s.substr(pos_start));
+  if (split_string.size() != 2)
+    return alias_item;
+  else {
+    return {split_string[0], split_string[1]};
+    ;
+  }
 }
-void printVector2D(vector<vector<string>> vec) {
+void printVectorAliasStruct(vector<alias_struct> vec) {
   for (int i = 0; i < vec.size(); i++) {
-    for (int j = 0; j < vec[i].size(); j++) {
-      cout << vec[i][j] << endl;
-    }
+    cout << vec[i].name << "\t";
+    cout << vec[i].meaning << endl;
   }
 }
 string preprocessString(string value) {
@@ -113,7 +125,7 @@ string preprocessString(string value) {
 }
 
 void drawTable() {
-  vector<vector<string>> table = {{"ALIAS", "MEANING"}};
+  vector<alias_struct> table = {{"ALIAS", "MEANING"}};
   const char *homedir;
   struct stat sb;
   int maxLenAlias = 1;
@@ -141,14 +153,13 @@ void drawTable() {
   while (getline(file, str)) {
     if (regex_match(str, ALIAS_PATTERN)) {
       str = str.substr(5);
-      vector<string> aliasItem = split(str, "=");
-      for (int i = 0; i < aliasItem.size(); i++) {
-        aliasItem[i] = preprocessString(aliasItem[i]);
-      }
-      maxLenAlias =
-          max<int>(max<int>(aliasItem[0].length(), maxLenAlias), MAX_ALIAS_COL);
-      maxLenMeaning = max<int>(max<int>(aliasItem[1].length(), maxLenMeaning),
-                               MAX_MEANING_COL);
+      alias_struct aliasItem = split(str, "=");
+      aliasItem.name = preprocessString(aliasItem.name);
+      aliasItem.meaning = preprocessString(aliasItem.meaning);
+      maxLenAlias = max<int>(max<int>(aliasItem.name.length(), maxLenAlias),
+                             MAX_ALIAS_COL);
+      maxLenMeaning = max<int>(
+          max<int>(aliasItem.meaning.length(), maxLenMeaning), MAX_MEANING_COL);
       table.push_back(aliasItem);
     }
   }
@@ -159,8 +170,8 @@ void drawTable() {
   }
   cout << endl;
 }
-vector<vector<string>> getTableAlias() {
-  vector<vector<string>> table;
+vector<alias_struct> getTableAlias() {
+  vector<alias_struct> table;
   const char *homedir;
   struct stat sb;
   int maxLenAlias = 1;
@@ -188,31 +199,30 @@ vector<vector<string>> getTableAlias() {
   while (getline(file, str)) {
     if (regex_match(str, ALIAS_PATTERN)) {
       str = str.substr(5);
-      vector<string> aliasItem = split(str, "=");
-      for (int i = 0; i < aliasItem.size(); i++) {
-        aliasItem[i] = preprocessString(aliasItem[i]);
-      }
-      maxLenAlias =
-          max<int>(max<int>(aliasItem[0].length(), maxLenAlias), MAX_ALIAS_COL);
-      maxLenMeaning = max<int>(max<int>(aliasItem[1].length(), maxLenMeaning),
-                               MAX_MEANING_COL);
+      alias_struct aliasItem = split(str, "=");
+      aliasItem.name = preprocessString(aliasItem.name);
+      aliasItem.meaning = preprocessString(aliasItem.name);
+      maxLenAlias = max<int>(max<int>(aliasItem.name.length(), maxLenAlias),
+                             MAX_ALIAS_COL);
+      maxLenMeaning = max<int>(
+          max<int>(aliasItem.meaning.length(), maxLenMeaning), MAX_MEANING_COL);
       table.push_back(aliasItem);
     }
   }
   return table;
 }
 
-vector<string> getAliases(vector<vector<string>> table) {
+vector<string> getAliases(vector<alias_struct> table) {
   vector<string> aliases = {};
   for (int idx = 0; idx < table.size(); idx++) {
-    aliases.push_back(table[idx][0]);
+    aliases.push_back(table[idx].name);
   }
   return aliases;
 }
-vector<string> getMeaning(vector<vector<string>> table) {
+vector<string> getMeaning(vector<alias_struct> table) {
   vector<string> meanings = {};
   for (int idx = 0; idx < table.size(); idx++) {
-    meanings.push_back(table[idx][1]);
+    meanings.push_back(table[idx].meaning);
   }
   return meanings;
 }

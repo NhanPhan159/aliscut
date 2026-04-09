@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     // ------------ variable defination -----------
     int selected = 0;
     string searchStr = "";
-    vector<vector<string>> table;
+    vector<alias_struct> table;
     table = getTableAlias();
     vector<string> entries = getAliases(table);
     vector<string> meanings = getMeaning(table);
