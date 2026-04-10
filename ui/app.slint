@@ -1,5 +1,9 @@
 import { VerticalBox, ScrollView } from "std-widgets.slint";
 
+struct Alias {
+   name: string,
+	 meaning: string,
+}
 export component AppWindow inherits Window {
     no-frame: true;
     width: 600px;
@@ -7,10 +11,11 @@ export component AppWindow inherits Window {
     background: #192128;
     forward-focus: key-handler;
     callback close-app;
-    in-out property <int> selected-index: 0;
-    in-out property <int> row-count: 30;
-    in-out property <brush> active-bg: #141617;
-    in property <[[string]]> tableAlias;
+    callback send-a-alias-name(string);
+    out property <int> selected-index: 0;
+    in property <int> row_count;
+    out property <brush> active-bg: #141617;
+    in property <[Alias]> aliases_table;
 
     key-handler := FocusScope {
         key-pressed(event) => {
@@ -19,7 +24,7 @@ export component AppWindow inherits Window {
                 accept;
             }
             if (event.text == "j" || event.text == "J") {
-                if (root.selected-index < root.row-count - 1) {
+                if (root.selected-index < root.row_count - 1) {
                     root.selected-index += 1;
                 }
                 accept;
@@ -28,6 +33,10 @@ export component AppWindow inherits Window {
                 if (root.selected-index > 0) {
                     root.selected-index -= 1;
                 }
+                accept;
+            }
+            if (event.text == "\n") {
+                root.send-a-alias-name(aliases_table[root.selected-index].name);
                 accept;
             }
             accept;
@@ -68,7 +77,7 @@ export component AppWindow inherits Window {
                     width: 100%;
                     spacing: 8px;
 
-                    for i in 30: Rectangle {
+                    for alias[i] in aliases_table: Rectangle {
                         background: root.selected-index == i ? active-bg : transparent;
                         opacity: 0.5;
                         height: 30px;
@@ -78,7 +87,7 @@ export component AppWindow inherits Window {
                             padding-right: 18px;
                             alignment: stretch;
                             Text {
-                                text: "hi";
+                                text: alias.name;
                                 color: white;
                                 font-family: "monospace";
                                 font-size: 18px;
@@ -87,7 +96,7 @@ export component AppWindow inherits Window {
                             }
 
                             Text {
-                                text: "used to say hello";
+                                text: alias.meaning;
                                 color: #aab0c4;
                                 font-family: "monospace";
                                 font-size: 18px;

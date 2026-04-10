@@ -201,7 +201,7 @@ vector<alias_struct> getTableAlias() {
       str = str.substr(5);
       alias_struct aliasItem = split(str, "=");
       aliasItem.name = preprocessString(aliasItem.name);
-      aliasItem.meaning = preprocessString(aliasItem.name);
+      aliasItem.meaning = preprocessString(aliasItem.meaning);
       maxLenAlias = max<int>(max<int>(aliasItem.name.length(), maxLenAlias),
                              MAX_ALIAS_COL);
       maxLenMeaning = max<int>(

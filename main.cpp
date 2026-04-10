@@ -1,29 +1,49 @@
-#include "../build/app-window.h"
+#include "../build/app.h"
 #include "include/static/drawTable.hpp"
 #include <cstdlib>
 #include <cstring>
+#include <iterator>
+#include <private/slint_models.h>
+#include <private/slint_string.h>
 #include <string>
+#include <unistd.h>
 #include <vector>
+
 using namespace std;
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
 
     // ------------ variable defination -----------
-    int selected = 0;
-    string searchStr = "";
     vector<alias_struct> table;
     table = getTableAlias();
     vector<string> entries = getAliases(table);
     vector<string> meanings = getMeaning(table);
     vector<string> filterEntries = entries;
+    vector<Alias> tableSlintForm;
+    string command;
+    for (int i = 0; i < table.size(); i++) {
+      tableSlintForm.push_back(Alias{slint::SharedString(table[i].name),
+                                     slint::SharedString(table[i].meaning)});
+    }
+    auto table_model =
+        std::make_shared<slint::VectorModel<Alias>>(tableSlintForm);
 
-    auto ui = AppWindow::create();
-    ui->on_close_app([&]() {
-      ui->window().hide();
+    auto app = AppWindow::create();
+    app->on_close_app([&]() {
+      app->window().hide();
       slint::quit_event_loop();
     });
-    ui->run();
+    app->on_send_a_alias_name([&](slint::SharedString aliasName) {
+      app->window().hide();
+      command = string(aliasName);
+      slint::quit_event_loop();
+    });
+    app->set_aliases_table(table_model);
+    app->set_row_count(table.size());
+    app->run();
+    system("clear");
+    cout << command << endl;
     return 0;
 
   } else if (argc == 2) {
