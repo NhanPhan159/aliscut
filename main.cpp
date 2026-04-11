@@ -1,5 +1,6 @@
 #include "../build/app.h"
 #include "include/static/drawTable.hpp"
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
     });
     app->set_aliases_table(table_model);
     app->set_row_count(table.size());
+    app->set_page_count(ceil(table.size() / 9.0));
     app->run();
     system("clear");
     cout << command << endl;

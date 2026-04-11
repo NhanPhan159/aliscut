@@ -1,4 +1,4 @@
-import { VerticalBox, ScrollView } from "std-widgets.slint";
+import { VerticalBox, ScrollView, Button } from "std-widgets.slint";
 
 struct Alias {
    name: string,
@@ -11,11 +11,16 @@ export component AppWindow inherits Window {
     background: #192128;
     forward-focus: key-handler;
     callback close-app;
+    callback calculate-page;
     callback send-a-alias-name(string);
     out property <int> selected-index: 0;
     in property <int> row_count;
+    out property <int> maxItemInPage: 9;
+    out property <int> currentPage: 1;
+    out property <int> max_row: 1;
     out property <brush> active-bg: #141617;
     in property <[Alias]> aliases_table;
+    in property <int> page_count;
 
     key-handler := FocusScope {
         key-pressed(event) => {
@@ -24,9 +29,28 @@ export component AppWindow inherits Window {
                 accept;
             }
             if (event.text == "j" || event.text == "J") {
-                if (root.selected-index < root.row_count - 1) {
+                if (currentPage == page_count) {
+                    root.max_row = Math.mod(root.aliases_table.length, root.maxItemInPage)
+                } else {
+                    root.max_row = root.maxItemInPage
+                }
+                if (root.selected-index < root.max_row - 1) {
                     root.selected-index += 1;
                 }
+                accept;
+            }
+            if (event.text == "h" || event.text == "H") {
+                if (root.currentPage > 1) {
+                    root.currentPage -= 1;
+                }
+                root.selected-index = 0;
+                accept;
+            }
+            if (event.text == "l" || event.text == "L") {
+                if (root.currentPage < root.page_count) {
+                    root.currentPage += 1;
+                }
+                root.selected-index = 0;
                 accept;
             }
             if (event.text == "k" || event.text == "K") {
@@ -36,7 +60,7 @@ export component AppWindow inherits Window {
                 accept;
             }
             if (event.text == "\n") {
-                root.send-a-alias-name(aliases_table[root.selected-index].name);
+                root.send-a-alias-name(aliases_table[(root.currentPage - 1) * root.maxItemInPage + selected-index].name);
                 accept;
             }
             accept;
@@ -70,40 +94,54 @@ export component AppWindow inherits Window {
                 }
             }
 
-            scroll-view := ScrollView {
-                vertical-scrollbar-policy: ScrollBarPolicy.as-needed;
-                height: 100%;
-                VerticalLayout {
-                    width: 100%;
-                    spacing: 8px;
+            VerticalLayout {
+                width: 100%;
+                spacing: 8px;
 
-                    for alias[i] in aliases_table: Rectangle {
-                        background: root.selected-index == i ? active-bg : transparent;
-                        opacity: 0.5;
-                        height: 30px;
-                        border-radius: 1px;
-                        HorizontalLayout {
-                            padding-left: 18px;
-                            padding-right: 18px;
-                            alignment: stretch;
-                            Text {
-                                text: alias.name;
-                                color: white;
-                                font-family: "monospace";
-                                font-size: 18px;
-                                vertical-alignment: center;
-                                horizontal-stretch: 1;
-                            }
-
-                            Text {
-                                text: alias.meaning;
-                                color: #aab0c4;
-                                font-family: "monospace";
-                                font-size: 18px;
-                                vertical-alignment: center;
-                                horizontal-alignment: right;
-                            }
+                for i in maxItemInPage: Rectangle {
+                    background: root.selected-index == i ? active-bg : transparent;
+                    opacity: 0.5;
+                    height: 30px;
+                    border-radius: 1px;
+                    HorizontalLayout {
+                        padding-left: 18px;
+                        padding-right: 18px;
+                        alignment: stretch;
+                        Text {
+                            text: aliases_table[(root.currentPage - 1) * root.maxItemInPage + i].name;
+                            color: white;
+                            font-family: "monospace";
+                            font-size: 18px;
+                            vertical-alignment: center;
+                            horizontal-stretch: 1;
                         }
+
+                        Text {
+                            text: aliases_table[(root.currentPage - 1) * root.maxItemInPage + i].meaning;
+                            color: #aab0c4;
+                            font-family: "monospace";
+                            font-size: 18px;
+                            vertical-alignment: center;
+                            horizontal-alignment: right;
+                        }
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                alignment: center;
+                spacing: 8px;
+                padding-top: 8px;
+                Rectangle {
+                    background: #b6c2ea;
+                    width: 80px;
+                    height: 24px;
+                    Text {
+                        text: root.currentPage + " of " + root.page_count;
+                        color: white;
+                        font-family: "monospace";
+                        font-size: 16px;
+                        vertical-alignment: center;
                     }
                 }
             }
