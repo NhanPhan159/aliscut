@@ -44,8 +44,6 @@ int main(int argc, char *argv[]) {
     app->set_row_count(table.size());
     app->set_page_count(ceil(table.size() / 9.0));
     app->run();
-    system("clear");
-    cout << command << endl;
     return 0;
 
   } else if (argc == 2) {

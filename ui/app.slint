@@ -1,4 +1,5 @@
 import { VerticalBox, ScrollView, Button } from "std-widgets.slint";
+import { Theme } from "./theme.slint";
 
 struct Alias {
    name: string,
@@ -8,8 +9,8 @@ export component AppWindow inherits Window {
     no-frame: true;
     width: 600px;
     height: 400px;
-    background: #192128;
     forward-focus: key-handler;
+    background: Theme.BG;
     callback close-app;
     callback calculate-page;
     callback send-a-alias-name(string);
@@ -80,12 +81,12 @@ export component AppWindow inherits Window {
             HorizontalLayout {
                 alignment: center;
                 Rectangle {
-                    background: #b6c2ea;
+                    background: Theme.BG_HEADER;
                     width: 80px;
                     height: 24px;
                     Text {
                         text: "Alias";
-                        color: #282c2f;
+                        color: Theme.TEXT_HEADER;
                         font-family: "monospace";
                         font-size: 18px;
                         horizontal-alignment: center;
@@ -99,7 +100,7 @@ export component AppWindow inherits Window {
                 spacing: 8px;
 
                 for i in maxItemInPage: Rectangle {
-                    background: root.selected-index == i ? active-bg : transparent;
+                    background: root.selected-index == i ? Theme.HOVER : transparent;
                     opacity: 0.5;
                     height: 30px;
                     border-radius: 1px;
@@ -109,7 +110,7 @@ export component AppWindow inherits Window {
                         alignment: stretch;
                         Text {
                             text: aliases_table[(root.currentPage - 1) * root.maxItemInPage + i].name;
-                            color: white;
+                            color: root.selected-index == i ? Theme.HOVER_TEXT : Theme.TEXT;
                             font-family: "monospace";
                             font-size: 18px;
                             vertical-alignment: center;
@@ -118,7 +119,7 @@ export component AppWindow inherits Window {
 
                         Text {
                             text: aliases_table[(root.currentPage - 1) * root.maxItemInPage + i].meaning;
-                            color: #aab0c4;
+                            color: Theme.TEXT;
                             font-family: "monospace";
                             font-size: 18px;
                             vertical-alignment: center;
@@ -133,12 +134,12 @@ export component AppWindow inherits Window {
                 spacing: 8px;
                 padding-top: 8px;
                 Rectangle {
-                    background: #b6c2ea;
+                    background: Theme.BG_FOOTER;
                     width: 80px;
                     height: 24px;
                     Text {
                         text: root.currentPage + " of " + root.page_count;
-                        color: white;
+                        color: Theme.TEXT_FOOTER;
                         font-family: "monospace";
                         font-size: 16px;
                         vertical-alignment: center;
