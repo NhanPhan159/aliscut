@@ -39,11 +39,14 @@ int main(int argc, char *argv[]) {
       app->window().hide();
       command = string(aliasName);
       slint::quit_event_loop();
+      system("clear");
+      cout << command << endl;
     });
     app->set_aliases_table(table_model);
     app->set_row_count(table.size());
     app->set_page_count(ceil(table.size() / 9.0));
     app->run();
+
     return 0;
 
   } else if (argc == 2) {
@@ -51,6 +54,5 @@ int main(int argc, char *argv[]) {
       drawTable();
     }
   }
-
   return EXIT_SUCCESS;
 }
