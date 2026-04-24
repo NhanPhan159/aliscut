@@ -59,7 +59,7 @@ mkdir build && cd build
 Install **cargo** first (Rust's build tool — see [rust-lang.org](https://www.rust-lang.org/tools/install)).
 
 ```bash
-cmake --build .
+cmake ..
 make
 ```
 
@@ -77,7 +77,7 @@ cd ../lib && sudo mv cmake libslint_cpp.so /usr/local/lib
 
 Then build:
 ```bash
-cmake --build .
+cmake ..
 make
 ```
 
@@ -91,7 +91,7 @@ In `CMakeLists.txt`, uncomment:
 Then:
 ```bash
 tar -xvf install.tar.gz
-cmake --build .
+cmake ..
 make
 ```
 
