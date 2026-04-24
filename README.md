@@ -1,7 +1,7 @@
 <h1 align="center">Aliscut</h1>
 
 <p align="center">
-Minimal CLI show alias in system, written in C++
+Minimal CLI show alias commands in system, written in C++
 </p>
 
 <div align="center">
