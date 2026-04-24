@@ -1,3 +1,4 @@
 DrawAliasTable
 build/
-cmake/
+install/
+

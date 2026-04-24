@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 4.2)
 project(aliscut)
 
 include(GNUInstallDirs)
+# uncomment this line below if you're using macos
 # list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 find_package(Slint QUIET)
 if(NOT Slint_FOUND)
