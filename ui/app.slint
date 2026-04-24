@@ -119,7 +119,7 @@ export component AppWindow inherits Window {
 
                         Text {
                             text: aliases_table[(root.currentPage - 1) * root.maxItemInPage + i].meaning;
-                            color: Theme.TEXT;
+                            color: root.selected-index == i ? Theme.HOVER_TEXT : Theme.TEXT;
                             font-family: "monospace";
                             font-size: 18px;
                             vertical-alignment: center;
