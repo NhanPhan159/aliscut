@@ -12,10 +12,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#endif
 
 using namespace std;
-
-string getCurrentShell() {
+std::string getCurrentShell() {
+#ifdef __APPLE__
   pid_t ppid = getppid();
 
   struct kinfo_proc info;
@@ -27,22 +30,30 @@ string getCurrentShell() {
 
   std::string shellPath = info.kp_proc.p_comm;
 
-  // p_comm may be truncated, fallback to SHELL env if needed
   if (shellPath.empty()) {
     const char *envShell = getenv("SHELL");
-    if (envShell) {
+    if (envShell)
       shellPath = envShell;
-    } else {
+    else
       return "Unknown";
-    }
   }
 
-  // Strip path, return just the name (e.g. "/bin/zsh" -> "zsh")
   size_t pos = shellPath.rfind('/');
   if (pos != std::string::npos)
     return shellPath.substr(pos + 1);
 
   return shellPath;
+
+#else
+  // Linux: use /proc
+  pid_t ppid = getppid();
+  std::string path = "/proc/" + std::to_string(ppid) + "/comm";
+  std::ifstream file(path);
+  std::string shellName;
+  if (file >> shellName)
+    return shellName;
+  return "Unknown";
+#endif
 }
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
