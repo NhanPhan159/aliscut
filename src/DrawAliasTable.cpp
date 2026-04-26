@@ -8,12 +8,42 @@
 #include <regex>
 #include <string>
 #include <sys/stat.h>
+#include <sys/sysctl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
 using namespace std;
 
+string getCurrentShell() {
+  pid_t ppid = getppid();
+
+  struct kinfo_proc info;
+  size_t length = sizeof(info);
+  int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, ppid};
+
+  if (sysctl(mib, 4, &info, &length, nullptr, 0) != 0)
+    return "Unknown";
+
+  std::string shellPath = info.kp_proc.p_comm;
+
+  // p_comm may be truncated, fallback to SHELL env if needed
+  if (shellPath.empty()) {
+    const char *envShell = getenv("SHELL");
+    if (envShell) {
+      shellPath = envShell;
+    } else {
+      return "Unknown";
+    }
+  }
+
+  // Strip path, return just the name (e.g. "/bin/zsh" -> "zsh")
+  size_t pos = shellPath.rfind('/');
+  if (pos != std::string::npos)
+    return shellPath.substr(pos + 1);
+
+  return shellPath;
+}
 void printByColor(string content = "", string color = COLOR_CODE_DEFAULT) {
   cout << color << content << RESET_CODE;
 }
@@ -130,20 +160,26 @@ void drawTable() {
   struct stat sb;
   int maxLenAlias = 1;
   int maxLenMeaning = 1;
-  string support_shell[] = {"/.bashrc", "/.zshrc"};
+  string support_shells[] = {"/.bashrc", "/.zshrc"};
   string shell_config_path;
+  string current_shell;
   char *shell_config_path_char;
+  for (string shell : support_shells) {
+    if (shell.find(getCurrentShell()) != std::string::npos)
+      current_shell = shell;
+  }
 
   // get shell config path
   if ((homedir = getenv("HOME")) == NULL) {
     homedir = getpwuid(getuid())->pw_dir;
   }
-  for (string shell : support_shell) {
-    shell_config_path = (string)homedir + shell;
-    shell_config_path_char = shell_config_path.data();
-    if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
-      break;
-    }
+  shell_config_path = (string)homedir + current_shell;
+  shell_config_path_char = shell_config_path.data();
+  if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
+  }
+  if (shell_config_path.size() == 0) {
+    cout << "This app current does not support your shell";
+    return;
   }
 
   // get table alias
@@ -163,6 +199,7 @@ void drawTable() {
       table.push_back(aliasItem);
     }
   }
+  cout << "\n";
   if (table.size() > 1) {
     setTable(maxLenAlias + 2, maxLenMeaning + 4, table);
   } else {
@@ -176,20 +213,26 @@ vector<alias_struct> getTableAlias() {
   struct stat sb;
   int maxLenAlias = 1;
   int maxLenMeaning = 1;
-  string support_shell[] = {"/.bashrc", "/.zshrc"};
+  string support_shells[] = {"/.bashrc", "/.zshrc"};
   string shell_config_path;
+  string current_shell;
   char *shell_config_path_char;
+  for (string shell : support_shells) {
+    if (shell.find(getCurrentShell()) != std::string::npos)
+      current_shell = shell;
+  }
 
   // get shell config path
   if ((homedir = getenv("HOME")) == NULL) {
     homedir = getpwuid(getuid())->pw_dir;
   }
-  for (string shell : support_shell) {
-    shell_config_path = (string)homedir + shell;
-    shell_config_path_char = shell_config_path.data();
-    if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
-      break;
-    }
+  shell_config_path = (string)homedir + current_shell;
+  shell_config_path_char = shell_config_path.data();
+  if (stat(shell_config_path_char, &sb) == 0 && !(sb.st_mode & S_IFDIR)) {
+  }
+  if (shell_config_path.size() == 0) {
+    cout << "This app current does not support your shell";
+    return table;
   }
 
   // get table alias

@@ -24,3 +24,4 @@ void drawTable();
 vector<alias_struct> getTableAlias();
 vector<string> getAliases(vector<alias_struct> table);
 vector<string> getMeaning(vector<alias_struct> table);
+string getCurrentShell();
