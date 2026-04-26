@@ -8,7 +8,6 @@
 #include <regex>
 #include <string>
 #include <sys/stat.h>
-#include <sys/sysctl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
